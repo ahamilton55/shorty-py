@@ -1,4 +1,8 @@
 *.swp
+.cache
+.coverage
+
+shorty.db
 
 # virtualenv stuff
 bin
@@ -7,3 +11,4 @@ lib
 lib64
 __pycache__
 pip-selfcheck.json
+share
