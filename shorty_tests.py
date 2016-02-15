@@ -8,6 +8,38 @@ from mock import Mock, patch
 
 from flask.ext.api import status
 
+
+class ShortyCheckShortName(unittest.TestCase):
+    @patch('sqlite3.connect')
+    def test_check_short_name_good(self, mock_sqlite3):
+        mock_sqlite3.cursor().fetchone.return_value = None
+        rtn = shorty.check_short_name(mock_sqlite3, "test")
+        assert rtn == False
+
+    @patch('sqlite3.connect')
+    def test_check_short_name_bad(self, mock_sqlite3):
+        mock_sqlite3.cursor().fetchone.return_value = ['blah']
+        rtn = shorty.check_short_name(mock_sqlite3, "test")
+        assert rtn == True
+
+
+class ShortyGetShortName(unittest.TestCase):
+    @patch('shorty.check_short_name', return_value=True)
+    @patch('sqlite3.connect')
+    def test_get_short_name_bad_custom(self, mock_sqlite3, mock_check_short_name):
+        short_name = "test"
+        rtn_success, rtn_short_name = shorty.get_short_name(mock_sqlite3, {"name": short_name})
+        assert rtn_success == False
+        assert rtn_short_name == short_name
+
+    @patch('shorty.check_short_name', return_value=True)
+    @patch('sqlite3.connect')
+    def test_get_short_name_bad(self, mock_sqlite3, mock_check_short_name):
+        rtn_success, rtn_short_name = shorty.get_short_name(mock_sqlite3,
+                                                               {})
+        assert rtn_success == False
+
+
 class ShortyTestConnectDB(unittest.TestCase):
     def setUp(self):
         self.app = shorty.app.test_client()
@@ -23,6 +55,7 @@ class ShortyTestConnectDB(unittest.TestCase):
         shorty.app.config['DB_LOCATION'] = ':memory:'
         rtn = self.app.get('/')
         assert rtn.status_code == status.HTTP_200_OK
+        del shorty.app.config['DB_LOCATION']
 
 
 class ShortyTestGetOrigURL(unittest.TestCase):
@@ -44,7 +77,7 @@ class ShortyDefaultRouteTestCase(unittest.TestCase):
 
     def test_root(self):
         rtn = self.app.get('/')
-        assert 'Hello world' in rtn.data.decode('utf-8')
+        assert 'Move along people. Nothing to see here!' in rtn.data.decode('utf-8')
         assert rtn.status_code == status.HTTP_200_OK
 
     @patch('shorty.get_orig_url', return_value='https://google.com/')
@@ -73,27 +106,44 @@ class ShortyAddRouteTestCases(unittest.TestCase):
     def setUp(self):
         self.app = shorty.app.test_client()
 
-    @patch('shorty.sqlite3.connect')
-    def test_add(self, mock_sqlite3_connect):
-        rtn = self.app.put('/add', data=dict(url="https://google.com/"))
+    @patch('shorty.sqlite3')
+    def test_add(self, mock_sqlite3):
+        mock_sqlite3.connect().cursor().fetchone.return_value = False
+        rtn = self.app.post('/add', data=dict(url="https://google.com/"))
         assert rtn.status_code == status.HTTP_201_CREATED
 
-    @patch('shorty.sqlite3.connect')
-    def test_missing_param(self, mock_sqlite3_connect):
-        rtn = self.app.put('/add', data={})
+    @patch('shorty.sqlite3')
+    def test_add_custom(self, mock_sqlite3):
+        mock_sqlite3.connect().cursor().fetchone.return_value = False
+        rtn = self.app.post('/add', data=dict(url="https://google.com/",
+                                              name="custom_name"))
+        assert rtn.status_code == status.HTTP_201_CREATED
+
+    @patch('shorty.sqlite3')
+    def test_missing_param(self, mock_sqlite3):
+        rtn = self.app.post('/add', data={})
         assert rtn.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch('shorty.sqlite3.connect')
-    def test_bad_add_method(self, mock_sqlite3_connect):
-        rtn = self.app.post('/add', data=dict(url="https://google.com/"))
+    @patch('shorty.sqlite3')
+    def test_bad_add_method(self, mock_sqlite3):
+        rtn = self.app.put('/add', data=dict(url="https://google.com/"))
         assert rtn.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
-    @patch('shorty.add_new_short_link', side_effect=sqlite3.DatabaseError)
+    @patch('shorty.get_short_name', return_value=(True, ""))
+    @patch('shorty.add_short_link_to_db')
     @patch('shorty.sqlite3.connect')
     def test_bad_db_add_method(self, mock_sqlite3_connect,
-                               mock_add_new_short_link):
-        rtn = self.app.put('/add', data=dict(url="https://google.com/"))
+                               mock_add_short_link_to_db, mock_get_short_name):
+        mock_add_short_link_to_db.side_effect = sqlite3.DatabaseError
+        rtn = self.app.post('/add', data=dict(url="https://google.com/"))
         assert rtn.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    @patch('shorty.get_short_name', return_value=(False, "conflict"))
+    @patch('shorty.sqlite3')
+    def test_add_method_conflict(self, mock_sqlite3_connect,
+                               mock_get_short_name):
+        rtn = self.app.post('/add', data=dict(url="https://google.com/"))
+        assert rtn.status_code == status.HTTP_409_CONFLICT
 
 class ShortyDeleteRouteTestCases(unittest.TestCase):
     def setUp(self):
