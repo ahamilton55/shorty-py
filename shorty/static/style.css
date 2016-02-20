@@ -1,0 +1,104 @@
+html, body {
+    margin: 10px;
+    padding: 0;
+    background-color: #e0e0e0;
+}
+
+body {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header {
+    background-color: #036;
+    color: #fff;
+    padding: 15px;
+    text-align: left;
+    border-radius: 25px 25px 0 0;
+}
+
+h1 {
+    font-size: 4.0rem;
+    margin: 0px;
+    padding: 15px;
+    padding-left: 30px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+h3 {
+    font-size: 2.25rem;
+}
+
+.content {
+    margin: 0;
+    padding: 0px;
+    padding-bottom: 20px;
+    text-align: center;
+    font-family: 'Noto Sans', sans-serif;
+    background-color: #f8f8f8;
+    display: inline-block;
+    width: 100%;
+    border-radius: 0 0 25px 25px;
+    font-size: 2.0rem;
+}
+
+form {
+    width: 900px;
+    margin: auto;
+    display: inline-block;
+}
+
+input[type=text] {
+    width: 780px;
+    padding: 12px 20px;
+    margin: 5px;
+    box-sizing: border-box;
+    font-size: 1.4rem;
+    border-radius: 5px;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 16px 8px;
+    text-decoration: none;
+    margin: 10px 0px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    border-radius: 5px;
+}
+
+label{
+    display: inline-block;
+    float: left;
+    clear: left;
+    width: 100px;
+    text-align: right;
+    font-size: 2.0rem;
+    font-weight: bold;
+    padding: 0;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+
+input {
+    display: inline-block;
+    float: left;
+}
+
+#add_button {
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    float: right;
+}
+
+a {
+    color: #036;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #336;
+}

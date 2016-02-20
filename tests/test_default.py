@@ -28,7 +28,6 @@ class ShortyDefaultRouteTestCase(unittest.TestCase):
 
     def test_root(self):
         rtn = self.app.get('/')
-        assert 'Move along people. Nothing to see here!' in rtn.data.decode('utf-8')
         assert rtn.status_code == status.HTTP_200_OK
 
     @patch('shorty.default.get_orig_url', return_value='https://google.com/')

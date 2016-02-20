@@ -2,7 +2,7 @@
 
 import sqlite3
 
-from flask import Blueprint, g, redirect
+from flask import Blueprint, g, redirect, render_template
 from flask.ext.api import status
 
 
@@ -24,7 +24,7 @@ def get_orig_url(conn, short_link):
 @default_handlers.route('/<path:path>')
 def root(path):
     if path == '':
-        return "Move along people. Nothing to see here!\n\n-- Officer Barbrady"
+        return render_template("index.html")
 
     try:
         orig_url = get_orig_url(g.db, path)
