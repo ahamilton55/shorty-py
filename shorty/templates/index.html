@@ -43,18 +43,17 @@
                     url: $form.attr('action'),
                     method: 'POST',
                     data: $form.serialize(),
+                    dataType: "json",
                     success: function(result) {
                         //alert(result);
-                        $("#new_link").html("<a href='" + result + "'>" + result + "</a>");
+                        $("#new_link").html("<a href='" + result["url"] + "'>"
+                                + result["url"] + "</a>");
                         $("#default").toggle();
                         $("#added_link").toggle();
                     },
                     error: function(result) {
-                        if ( result.status === 409 ) {
-                            alert("Link with this name already exists. Please try another.");
-                        } else {
-                            alert("Error creating link. Please check your input!");
-                        }
+                        var msg = new DOMParser().parseFromString(result.responseJSON["msg"], "text/html");
+                        alert(msg.documentElement.textContent);
                     }
                 });
                 event.preventDefault();

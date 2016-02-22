@@ -28,6 +28,7 @@ class ShortyTestConnectDB(unittest.TestCase):
 
 
 class ShortyTestInitDB(unittest.TestCase):
+    @patch('shorty.get_db_location', return_value=":memory:")
     @patch('shorty.sqlite3.connect')
-    def test_init_db(self, mock_sqlite3_connect):
+    def test_init_db(self, mock_sqlite3_connect, mock_get_db_location):
         shorty.init_db()

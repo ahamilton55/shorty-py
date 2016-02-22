@@ -40,14 +40,14 @@ def connect_db():
 
 
 def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource('resources/schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+    if not os.path.exists(get_db_location()) or get_db_location == ':memory:':
+        with closing(connect_db()) as db:
+            with app.open_resource('resources/schema.sql', mode='r') as f:
+                db.cursor().executescript(f.read())
+            db.commit()
 
 
-if not os.path.exists(get_db_location()):
-    init_db()
+init_db()
 
 # In production mode, add log handler to sys.stderr.
 app.logger.addHandler(logging.StreamHandler())
