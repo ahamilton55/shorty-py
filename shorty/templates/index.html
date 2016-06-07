@@ -23,15 +23,15 @@
         <div class="content" id="default">
             <h3>Create a new short link!</h3>
             <form id="create" action="/add" method="POST">
-                <label>URL</label><input type="text" name="url" placeholder="Paste in a link"><br />
-                <label>Name</label><input type="text" name="name" placeholder="An optional name for the link"><br />
+                <label>URL</label><input id="url" type="text" name="url" placeholder="Paste in a link"><br />
+                <label>Name</label><input id="name" type="text" name="name" placeholder="An optional name for the link"><br />
                 <input id="add_button" type="submit" value="Add">
             </form>
         </div>
         <div class="content" id="added_link" style="display: none">
             <h3>New link successfully created.</h3>
             <p id="new_link"></p>
-            <p><a href="javascript:createAnother()">Create another link</a></p>
+            <p><a id="create_another" href="javascript:createAnother()">Create another link</a></p>
         </div>
 
         <script>
